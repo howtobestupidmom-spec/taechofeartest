@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAECHOdongmool FEAR TEST by baehyuni</title>
+    <style>
+        /* 1. 폰트 설정: 현이의 LP 타이틀 폰트 */
+        @font-face {
+            font-family: 'ParentsArePeople';
+            src: url('ParentsArePeople-Regular.ttf') format('truetype');
+            font-weight: normal; 
+            font-style: normal;
+        }
+
+        :root {
+            --bg-main: #1A3C34; /* 🌲 딥 그린 배경 */
+            --accent-primary: #DFFF00; /* 네온 옐로우 */
+            --accent-secondary: #8A2BE2; /* 보라색 */
+            --bg-card: #00CED1; /* 청록색 */
+            --text-black: #000000;
+        }
+
+        /* 🎞️ 아날로그 그레인 필터 */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.15; z-index: 9999; pointer-events: none; mix-blend-mode: overlay;
+        }
+
+        body {
+            background: var(--bg-main); color: var(--text-black);
+            font-family: 'ParentsArePeople', sans-serif;
+            margin: 0; padding: 40px 20px; text-align: center; word-break: keep-all;
+        }
+
+        .container { max-width: 650px; margin: auto; }
+        .kr-main-title { font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 5px; }
+        h1 { font-size: 2.8rem; color: var(--accent-primary); margin-bottom: 10px; letter-spacing: -1px; text-shadow: 4px 4px 0px var(--text-black); transform: rotate(-1.5deg); line-height: 1.1; }
+        .subtitle { color: var(--accent-primary); font-size: 1.1rem; margin-bottom: 50px; background: var(--accent-secondary); display: inline-block; padding: 5px 25px; border: 4px solid var(--text-black); transform: rotate(1deg); }
+
+        .stage-header { margin-bottom: 30px; display: inline-block; }
+        .kr-small-label { display: block; font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .en-main-label { background: #fff; padding: 5px 15px; border: 3px solid #000; font-weight: bold; }
+
+        .animal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .animal-item { background: #fff; border: 4px solid var(--text-black); border-radius: 15px; padding: 10px; cursor: pointer; transition: 0.2s; }
+        .animal-item img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; border: 2px solid var(--text-black); margin-bottom: 8px; }
+        .animal-name { font-size: 0.95rem; font-weight: 700; }
+        .eng-name-grid { font-size: 0.75rem; text-transform: uppercase; }
+        .animal-item.active { background: var(--accent-primary); box-shadow: 6px 6px 0px var(--text-black); transform: translateY(-3px); }
+
+        .rating-card { background: var(--bg-card); padding: 30px; border-radius: 35px; margin-bottom: 40px; text-align: left; border: 4px solid var(--text-black); box-shadow: 12px 12px 0px var(--text-black); }
+        .card-header { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--text-black); padding-bottom: 15px; }
+        .card-header img { width: 70px; height: 70px; object-fit: cover; border-radius: 50%; border: 3px solid var(--text-black); margin-right: 15px; background: #fff; }
+        
+        .rating-row { margin: 25px 0; }
+        .label { font-size: 0.95rem; font-weight: 700; background: var(--accent-secondary); color: var(--accent-primary); display: inline-block; padding: 4px 12px; border: 2px solid var(--text-black); }
+        .eng-label { display: block; font-size: 0.75rem; margin-top: 2px; }
+        
+        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
+        .score-btn { flex: 1; padding: 15px 0; border: 3px solid var(--text-black); background: #fff; border-radius: 12px; cursor: pointer; font-weight: 900; font-size: 1.4rem; font-family: 'ParentsArePeople', sans-serif; }
+        .score-btn.active { background: var(--accent-primary); transform: translateY(-5px); box-shadow: 5px 5px 0 var(--text-black); }
+
+        .main-btn { background: var(--accent-primary); color: var(--text-black); border: 4px solid var(--text-black); padding: 22px 0; width: 100%; font-size: 1.8rem; font-weight: 900; cursor: pointer; border-radius: 60px; margin-top: 30px; box-shadow: 10px 10px 0px var(--text-black); font-family: 'ParentsArePeople', sans-serif; }
+        .hidden { display: none !important; }
+        
+        /* 결과 박스 */
+        .result-box { font-size: 1.7rem; color: var(--text-black); line-height: 1.8; font-weight: 700; padding: 50px 20px; background: var(--bg-card); border-radius: 40px; border: 4px solid var(--text-black); box-shadow: 15px 15px 0px var(--text-black); }
+        .eng-result { display: block; font-size: 1.1rem; margin-top: 15px; text-transform: uppercase; }
+
+        /* 하단 링크 섹션 */
+        .cute-name { font-size: 1.4rem; color: var(--accent-primary); background: var(--accent-secondary); display: inline-block; padding: 10px 25px; border: 3px solid var(--text-black); margin: 50px 0 15px 0; font-weight: 700; transform: rotate(-2deg); }
+        .link-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .link-btn { padding: 15px; border: 4px solid var(--text-black); border-radius: 20px; text-decoration: none; color: var(--text-black); font-weight: 900; font-size: 1.1rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-family: 'ParentsArePeople', sans-serif; }
+        .btn-spotify { background: #1DB954; } 
+        .btn-taecho { background: var(--accent-secondary); color: var(--accent-primary); }
+        .link-btn:hover { transform: scale(1.05) rotate(-2deg); box-shadow: 5px 5px 0px var(--text-black); }
+
+        .branding { font-size: 1rem; color: var(--accent-primary); margin-top: 100px; font-weight: bold; background: var(--accent-secondary); display: inline-block; padding: 8px 20px; border: 3px solid var(--text-black); transform: rotate(-2deg); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="kr-main-title">배현이의 태초동물: 동물로 파악해보는 두려움 테스트</div>
+        <h1>TAECHOdongmool<br>FEAR TEST</h1>
+        <div class="subtitle">curated by baehyuni</div>
+
+        <div id="selection-stage">
+            <div class="stage-header">
+                <span class="kr-small-label">가장 무서운 생명체 3종을 골라보세요.</span>
+                <div class="en-main-label">FEARY FRIENDS! PICK: 3 ANIMALS!</div>
+            </div>
+            <div id="animal-list" class="animal-grid"></div>
+            <button type="button" class="main-btn" onclick="goToRating()">GO NEXT 🍩</button>
+        </div>
+
+        <div id="rating-stage" class="hidden">
+            <div class="stage-header">
+                <span class="kr-small-label">당신의 공포 DNA를 추출하는 중입니다.</span>
+                <div class="en-main-label">EXTRACT FEAR DNA!</div>
+            </div>
+            <div id="selected-animals-rating"></div>
+            <button type="button" class="main-btn" onclick="goToResult()">ANALYZE 🧠</button>
+        </div>
+
+        <div id="result-stage" class="hidden">
+            <div style="font-size:1.1rem; margin-bottom:20px; font-weight:bold; background: var(--accent-secondary); color: var(--accent-primary); display: inline-block; padding: 5px 15px; border: 3px solid #000;">YOUR FEAR DNA IS...</div>
+            <div class="result-box" id="analysis-text"></div>
+            
+            <div class="cute-name">배현이의 작품으로 심신을 다스려 보아요 :)</div>
+            <div class="link-container">
+                <a href="https://www.youtube.com/@baehyuni" target="_blank" class="link-btn btn-taecho">WATCH TAECHO 📺</a>
+                <a href="https://open.spotify.com/artist/3bn08XRqTeHdA1IUT2vwyV?si=S1wX75uvSbuMBsZO85boxw" class="link-btn btn-spotify">SPOTIFY 🎧</a>
+            </div>
+
+            <button type="button" class="main-btn" onclick="location.reload()" style="margin-top: 40px; font-size: 1.4rem; padding: 15px 0;">RETRY 🔄</button>
+        </div>
+
+        <div class="branding">© 2026 배현이(baehyuni) / directed by mimi</div>
+    </div>
+
+    <script>
+        const animalData = [
+            { name: "사마귀", eng: "PRAYING MANTIS", img: "10. samagui.jpg" },
+            { name: "돈벌레", eng: "HOUSE CENTIPEDE", img: "05. griiiiima.webp" },
+            { name: "과일박쥐", eng: "FRUIT BAT", img: "02. fruitbat.png" },
+            { name: "심해어", eng: "DEEP-SEA FISH", img: "13. deepsea.png" },
+            { name: "타조", eng: "OSTRICH", img: "16. bigtajo.webp" },
+            { name: "하피 독수리", eng: "HARPY EAGLE", img: "17. eagle.jpg" },
+            { name: "벌거숭이 두더지쥐", eng: "NAKED MOLE-RAT", img: "07. naked.webp" },
+            { name: "코모도 왕도마뱀", eng: "KOMODO DRAGON", img: "15. king lizard.jpg" },
+            { name: "대왕오징어", eng: "GIANT SQUID", img: "04. squid.webp" },
+            { name: "흡혈파리", eng: "TSETSE FLY", img: "18. pari.jpg" },
+            { name: "벌꿀 오소리", eng: "HONEY BADGER", img: "08. nobakkuosori.webp" },
+            { name: "사자", eng: "LION", img: "11. lion.jpg.webp" },
+            { name: "시베리안 호랑이", eng: "SIBERIAN TIGER", img: "12. tiger.webp" },
+            { name: "아프리카 코끼리", eng: "AFRICAN ELEPHANT", img: "14. elephant.webp" },
+            { name: "대왕고래", eng: "BLUE WHALE", img: "03. bigwhale.jpg" },
+            { name: "북극곰", eng: "POLAR BEAR", img: "09. polarbear.jpg" },
+            { name: "바다악어", eng: "SALTWATER CROCODILE", img: "06. seacroco.jpg" },
+            { name: "고릴라", eng: "GORILLA", img: "01. gorilla.jpg" }
+        ];
+
+        const criteria = [
+            {id: "visual", label: "외형: 비주얼 쇼크 🙈", eng: "Visual Shock 🙈"},
+            {id: "lethality", label: "치명성: 나 죽는 거 아님? 💀", eng: "Lethality: Am I gonna die? 💀"},
+            {id: "aggression", label: "공격성: 갑자기 왜 이래 💢", eng: "Aggression: Why so mad? 💢"},
+            {id: "physical", label: "압도감: 체급 차이 무엇 🐘", eng: "Physical: Total Overwhelm 🐘"},
+            {id: "alien", label: "불통: 외계인 지능 느낌 👽", eng: "Alien: Zero Communication 👽"},
+            {id: "personality", label: "인성: 성격 진짜 파탄 😈", eng: "Personality: Pure Villainy 😈"}
+        ];
+
+        let selectedIndices = [];
+        const listDiv = document.getElementById('animal-list');
+
+        animalData.sort((a, b) => a.name.localeCompare(b.name)).forEach((data, index) => {
+            const item = document.createElement('div');
+            item.className = 'animal-item';
+            item.innerHTML = `<img src="${data.img}" alt="${data.name}"><div><div class="animal-name">${data.name}</div><div class="eng-name-grid">${data.eng}</div></div>`;
+            item.onclick = () => {
+                if (selectedIndices.includes(index)) {
+                    selectedIndices = selectedIndices.filter(i => i !== index);
+                    item.classList.remove('active');
+                } else {
+                    if (selectedIndices.length >= 3) { alert("딱 3마리만 골라줘!"); return; }
+                    selectedIndices.push(index);
+                    item.classList.add('active');
+                }
+            };
+            listDiv.appendChild(item);
+        });
+
+        function goToRating() {
+            if (selectedIndices.length < 3) { alert("3마리는 골라줘야지! 🍩"); return; }
+            const ratingDiv = document.getElementById('selected-animals-rating');
+            ratingDiv.innerHTML = "";
+            selectedIndices.forEach(idx => {
+                const data = animalData[idx];
+                let rows = "";
+                criteria.forEach(crit => {
+                    rows += `<div class="rating-row"><span class="label">${crit.label}<span class="eng-label">${crit.eng}</span></span><div class="btn-group" data-animal="${data.name}" data-crit="${crit.id}">${[1,2,3,4,5].map(n => `<button type="button" class="score-btn" onclick="setScore(this, ${n})">${n}</button>`).join('')}</div></div>`;
+                });
+                ratingDiv.innerHTML += `<div class="rating-card"><div class="card-header"><img src="${data.img}"><div style="display:flex; flex-direction:column;"><span style="font-size:1.5rem; font-weight:900;">🐾 ${data.name}</span><span style="font-size:0.9rem; opacity:0.8;">${data.eng}</span></div></div>${rows}</div>`;
+            });
+            document.getElementById('selection-stage').classList.add('hidden');
+            document.getElementById('rating-stage').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function setScore(btn, val) {
+            const group = btn.parentElement;
+            group.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            group.setAttribute('data-value', val);
+        }
+
+        function goToResult() {
+            const groups = document.querySelectorAll('.btn-group');
+            let scores = { visual: 0, lethality: 0, aggression: 0, physical: 0, alien: 0, personality: 0 };
+            let totalScore = 0;
+            let complete = true;
+
+            groups.forEach(g => {
+                const val = g.getAttribute('data-value');
+                if (!val) complete = false;
+                else {
+                    const s = parseInt(val);
+                    scores[g.getAttribute('data-crit')] += s;
+                    totalScore += s;
+                }
+            });
+
+            if (!complete) { alert("모든 항목에 점수를 매겨줘! 🧠"); return; }
+
+            const analysisBox = document.getElementById('analysis-text');
+
+            // 🏆 [특별 케이스] 전부 5점인 경우 (총점 90점)
+            if (totalScore === 90) {
+                analysisBox.innerHTML = "당신은 세상 모든 것이 두려운 <br><b>'태초의 순수 쫄보'</b> 입니다! 🐥<br><span class='eng-result'>ULTIMATE FEAR MASTER! 🐥<br>Everything is a threat to you.</span>";
+            } else {
+                // 동점자 랜덤 처리 로직
+                const maxVal = Math.max(...Object.values(scores));
+                const candidates = Object.keys(scores).filter(key => scores[key] === maxVal);
+                const maxCrit = candidates[Math.floor(Math.random() * candidates.length)];
+
+                const messages = {
+                    visual: "기괴한 비주얼에 유독 취약하시군요! 🙈<br>안구 보호가 시급합니다.<span class='eng-result'>Visual Shock-sensitive! 🙈</span>",
+                    lethality: "본능적으로 살고 싶은 생존왕이시네요! 🏃<br>위험 감지 능력이 거의 초능력 수준!<span class='eng-result'>Survival Master! 🏃</span>",
+                    aggression: "평화를 사랑하는 유리 심장을 가지셨군요! ✨<br>급발진 없는 세상에서 행복하세요.<span class='eng-result'>Peace Lover! ✨</span>",
+                    physical: "압도적 체급 앞에서 겸손해지는 지성인! 🐘<br>자연의 거대함을 아는 당신이 챔피언.<span class='eng-result'>Intelligent Human! 🐘</span>",
+                    alien: "말 안 통하는 대상을 가장 두려워하시네요! 👽<br>대화와 교감을 제일 중요하게 생각하는 분!<span class='eng-result'>Communication is Key! 👽</span>",
+                    personality: "성깔 있는 존재를 기가 막히게 알아채는군요! 😈<br>혹시 본인도 만만치 않은 성격?<span class='eng-result'>Taecho-dongmul Sniffer! 😈</span>"
+                };
+                analysisBox.innerHTML = messages[maxCrit];
+            }
+
+            document.getElementById('rating-stage').classList.add('hidden');
+            document.getElementById('result-stage').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
